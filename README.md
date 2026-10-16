@@ -549,6 +549,22 @@ plt.show()
 
 ---
 
+
+```
+sns.pairplot(
+    data=penguins,
+    hue="species",  # Group data points by color based on a category
+    vars=[
+        "bill_length_mm",
+        "bill_depth_mm",
+        "flipper_length_mm",
+    ],  # Only plot specific variables
+    corner=True,  # Remove the top half to prevent redundant visuals
+    palette="muted",  # Apply a custom color theme
+)
+
+```
+
 # Quick Cheatsheet Page Finder
 
 - **Page 1:** Load data, inspect columns, missing values, imputation, outliers, encoding, scaling, train/test split.
