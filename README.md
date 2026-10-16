@@ -66,53 +66,60 @@ plt.show()
 This code assumes the common SMS spam dataset: `v1` = label, `v2` = message. Change names if yours differ.
 
 ```python
-# ASSIGNMENT 2: NAIVE BAYES AND KNN
+# ==========================================
+# EXPERIMENT 2: NAIVE BAYES & KNN
+# ==========================================
+
 import pandas as pd
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.preprocessing import StandardScaler
+from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay
 
-# CHEATSHEET P1: Pandas / IO
+# 1. Load Data
 df = pd.read_csv("spam.csv", encoding="latin-1")
-print(df.head())
-print(df.columns)
+# Assume target is 'label' or 'class' and features are numeric
+X = df.iloc[:, :-1]
+y = df.iloc[:, -1]
 
-# CHANGE these column names if needed
-X = df["v2"].fillna("")       # Message text
-y = df["v1"]                  # ham/spam label
+# 2. Train-Test Split & Scaling
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-# Convert text into numeric features
-vectorizer = TfidfVectorizer()
-X = vectorizer.fit_transform(X)
-
-# CHEATSHEET P1: Split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
-
-# CHEATSHEET P2: Naive Bayes
-nb = MultinomialNB()
-nb.fit(X_train, y_train)
-y_pred = nb.predict(X_test)
-print("Naive Bayes Accuracy:", accuracy_score(y_test, y_pred))
-
-# CHEATSHEET P2: KNN + GridSearchCV
-knn = KNeighborsClassifier()
-params = {
-    "n_neighbors": [3, 5, 7],
-    "weights": ["uniform", "distance"]
+# 3. Naive Bayes Variants (Cheatsheet Sec 2)
+models = {
+    "Gaussian NB": GaussianNB(),
+    "Bernoulli NB": BernoulliNB()
 }
-grid = GridSearchCV(knn, params, cv=5, scoring="accuracy", n_jobs=-1)
-grid.fit(X_train, y_train)
 
-best_model = grid.best_estimator_
-y_pred = best_model.predict(X_test)
-print("Best Parameters:", grid.best_params_)
-print("Best CV Accuracy:", grid.best_score_)
-print("KNN Test Accuracy:", accuracy_score(y_test, y_pred))
-print(classification_report(y_test, y_pred))
+for name, model in models.items():
+    model.fit(X_train_scaled, y_train)
+    y_pred = model.predict(X_test_scaled)
+    print(f"--- {name} Accuracy: {accuracy_score(y_test, y_pred):.4f} ---")
+
+# 4. KNN with GridSearchCV (Cheatsheet Sec 9 Param Grid)
+knn = KNeighborsClassifier()
+knn_params = {
+    'n_neighbors': [3, 5, 7, 9],
+    'algorithm': ['kd_tree', 'ball_tree']
+}
+
+grid_knn = GridSearchCV(knn, knn_params, cv=5, scoring='accuracy', n_jobs=-1)
+grid_knn.fit(X_train_scaled, y_train)
+
+best_knn = grid_knn.best_estimator_
+y_pred_knn = best_knn.predict(X_test_scaled)
+
+print("\nBest KNN Params:", grid_knn.best_params_)
+print("Best KNN CV Score:", grid_knn.best_score_)
+print("KNN Test Accuracy:", accuracy_score(y_test, y_pred_knn))
+print("\nClassification Report:\n", classification_report(y_test, y_pred_knn))
+
+# 5. Confusion Matrix (Cheatsheet Sec 5)
+ConfusionMatrixDisplay.from_predictions(y_test, y_pred_knn)
 ```
 
 **Note:** If the dataset is already numeric, TF-IDF is unnecessary. Choose preprocessing according to the data type.
