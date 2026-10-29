@@ -593,6 +593,5 @@ sns.pairplot(
 
 
 
-
-https://chatgpt.com/share/6ae2aa7e-608c-83ee-85fe-59648379aca0
+https://chatgpt.com/share/6ae2e4e6-ff38-83ee-a87a-93d58b51028e
 
