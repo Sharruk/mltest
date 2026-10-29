@@ -584,3 +584,15 @@ sns.pairplot(
 3. Avoid data leakage: fit scalers and PCA on training data only; transform test data with the fitted objects.
 
 **Final note:** These are learning templates. Verify filenames, column names, data types and preprocessing before running. Text datasets need text vectorisation; categorical features need encoding; numeric missing values need suitable imputation.
+
+
+
+
+
+2fubH=mb8e+Hetv
+
+
+
+
+https://chatgpt.com/share/6ae2aa7e-608c-83ee-85fe-59648379aca0
+
